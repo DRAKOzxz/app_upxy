@@ -35,47 +35,41 @@ Todo dentro de tu red local, sin depender de servicios externos.
 
 ✨ Sistema completo de autenticación  
 💬 Chat global persistente  
-🔐 Seguridad básica con hash de contraseñas  
-🗄️ Base de datos SQLite integrada  
+🔐 Hash de contraseñas  
+🗄️ Base de datos SQLite  
 
 ---
 
-## 🎯 Funcionalidades
+## 📦 Requisitos
 
-### 🔐 Autenticación
-- Registro de usuarios
-- Login / Logout
-- Protección de rutas (solo usuarios autenticados)
+Antes de instalar, asegúrate de tener:
 
-### 📁 Archivos
-- 📤 Subir archivos
-- 📄 Ver archivos disponibles
-- 📥 Descargar archivos
-- 📂 Persistencia en `/uploads` (no se eliminan)
+- 🐍 Python 3.10+
+- 🔧 Git instalado
+- 🖥️ Terminal (recomendado)
 
-### 💬 Chat global
-- Chat en tiempo real entre usuarios
-- Mensajes guardados en base de datos
-- Comunicación simple y directa
+### 🐉 Opcional (entorno alternativo)
+
+Si tienes problemas en Windows:
+
+- Usa consola de **Kali Linux (WSL)**
+- O instala **Win-KeX** para entorno gráfico
 
 ---
 
-## 🖥️ Interfaz
-
-- 🧭 Barra de sesión (usuario activo)
-- 📁 Panel de archivos
-- 💬 Panel de chat
-- 🔐 Vista de autenticación (login/register)
-
----
-
-## ⚡ Instalación rápida
+## ⚡ Instalación
 
 ```bash
+# Clonar repositorio
+git clone https://github.com/tu-usuario/app_upxy.git
+
+cd app_upxy
+
+# Crear entorno virtual
 python -m venv .venv
 
 # Activar entorno
-source .venv/bin/activate   # Linux / Mac
+source .venv/bin/activate   # Linux / Mac / Kali
 .venv\Scripts\activate      # Windows
 
 # Instalar dependencias
