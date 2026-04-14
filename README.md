@@ -1,24 +1,33 @@
-
----
-
-## 🚀 Características
-
-- 📤 Subida de archivos (imágenes, videos, documentos, etc.)
-- 📥 Descarga de archivos compartidos
-- 🌐 Acceso multiusuario
-- 📂 Organización básica de archivos
-- 🔄 Sincronización entre usuarios
-- 🔒 (Opcional) Sistema de autenticación
-
----
-
-## 🛠️ Tecnologías utilizadas
-
-- Frontend: (Ej. HTML, CSS, JavaScript / React / etc.)
-- Backend: (Ej. Node.js, Python, etc.)
-- Base de datos: (Ej. MongoDB, MySQL, etc.)
-- Almacenamiento de archivos: (Local / Cloud)
-
----
-
-## 📦 Instalación
+diff --git a/README.md b/README.md
+index ef284f7bdd702ae63e6c44d32cd43c0d216f5f10..67d7761733407d7a13f8ac66b68f7456eaf1c2b8 100644
+--- a/README.md
++++ b/README.md
+@@ -1 +1,26 @@
+-# app_upxy
+\ No newline at end of file
++# app_upxy
++
++Aplicación web simple para compartir archivos en una red/local:
++
++- Subir archivos.
++- Ver listado de archivos compartidos.
++- Descargar archivos.
++
++## Requisitos
++
++- Python 3.10+
++
++## Ejecutar
++
++```bash
++python -m venv .venv
++source .venv/bin/activate
++pip install -r requirements.txt
++python app.py
++```
++
++Luego abre: `http://localhost:5000`
++
++## Nota
++
++Los archivos se guardan en la carpeta `uploads/` del proyecto.
