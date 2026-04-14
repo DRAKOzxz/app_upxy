@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compartir archivos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="topbar">
+        <div>
+          <h1>📁 App para compartir archivos</h1>
+          <p class="subtitle">Sesión iniciada como <strong>{{ username }}</strong></p>
+        </div>
+        <a class="link-btn" href="{{ url_for('logout') }}">Cerrar sesión</a>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="alerts">
+        {% for category, message in messages %}
+        <div class="alert {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      <section class="grid-2">
+        <article class="card">
+          <h2>Subir archivo</h2>
+          <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" required />
+            <button type="submit">Subir</button>
+          </form>
+
+          <h2>Archivos disponibles</h2>
+          {% if files %}
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Tamaño (KB)</th>
+                <th>Actualizado</th>
+                <th>Descarga</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for file in files %}
+              <tr>
+                <td>{{ file.name }}</td>
+                <td>{{ file.size_kb }}</td>
+                <td>{{ file.updated }}</td>
+                <td><a href="{{ url_for('download_file', filename=file.name) }}">Descargar</a></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No hay archivos todavía. ¡Sube el primero!</p>
+          {% endif %}
+        </article>
+
+        <article class="card chat-card">
+          <h2>💬 Chat común</h2>
+          <form action="{{ url_for('send_message') }}" method="post" class="chat-form">
+            <textarea
+              name="content"
+              placeholder="Escribe un mensaje para todos..."
+              rows="3"
+              maxlength="600"
+              required
+            ></textarea>
+            <button type="submit">Enviar</button>
+          </form>
+
+          <div class="chat-box">
+            {% for message in messages %}
+            <div class="msg">
+              <p class="msg-head"><strong>{{ message.username }}</strong> · {{ message.created_at }}</p>
+              <p>{{ message.content }}</p>
+            </div>
+            {% else %}
+            <p>Sin mensajes todavía.</p>
+            {% endfor %}
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
