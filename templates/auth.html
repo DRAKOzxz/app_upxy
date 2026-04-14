@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% if mode == 'login' %}Iniciar sesión{% else %}Registro{% endif %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <main class="container auth-wrap">
+      <section class="card auth-card">
+        <h1>{% if mode == 'login' %}Iniciar sesión{% else %}Crear cuenta{% endif %}</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alerts">
+          {% for category, message in messages %}
+          <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="post" class="auth-form">
+          <label>
+            Usuario
+            <input type="text" name="username" minlength="3" required />
+          </label>
+          <label>
+            Contraseña
+            <input type="password" name="password" minlength="6" required />
+          </label>
+          <button type="submit">{% if mode == 'login' %}Entrar{% else %}Registrarme{% endif %}</button>
+        </form>
+
+        {% if mode == 'login' %}
+        <p>¿No tienes cuenta? <a href="{{ url_for('register') }}">Regístrate</a></p>
+        {% else %}
+        <p>¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+</html>
