@@ -61,7 +61,7 @@ Si tienes problemas en Windows:
 
 ```bash
 # Clonar repositorio
-git clone https://github.com/tu-usuario/app_upxy.git
+git clone https://github.com/DRAKOzxz/app_upxy.git
 
 cd app_upxy
 
