@@ -1,33 +1,59 @@
-diff --git a/README.md b/README.md
-index ef284f7bdd702ae63e6c44d32cd43c0d216f5f10..67d7761733407d7a13f8ac66b68f7456eaf1c2b8 100644
---- a/README.md
-+++ b/README.md
-@@ -1 +1,26 @@
--# app_upxy
-\ No newline at end of file
-+# app_upxy
-+
-+Aplicación web simple para compartir archivos en una red/local:
-+
-+- Subir archivos.
-+- Ver listado de archivos compartidos.
-+- Descargar archivos.
-+
-+## Requisitos
-+
-+- Python 3.10+
-+
-+## Ejecutar
-+
-+```bash
-+python -m venv .venv
-+source .venv/bin/activate
-+pip install -r requirements.txt
-+python app.py
-+```
-+
-+Luego abre: `http://localhost:5000`
-+
-+## Nota
-+
-+Los archivos se guardan en la carpeta `uploads/` del proyecto.
+# 🌈 FileShare App
+
+<p align="center">
+  <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge&color=00C853">
+  <img src="https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge">
+  <img src="https://img.shields.io/badge/license-MIT-purple?style=for-the-badge">
+</p>
+
+<p align="center">
+  📁 Comparte, sube y descarga archivos fácilmente entre usuarios
+</p>
+
+---
+
+## ✨ Descripción
+
+**FileShare App** es una aplicación diseñada para permitir a los usuarios:
+
+🔹 Subir archivos  
+🔹 Ver contenido compartido  
+🔹 Descargar archivos  
+🔹 Compartir con otros usuarios  
+
+Todo en una plataforma simple, rápida y accesible.
+
+---
+
+## 🚀 Características
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Upload-Files-00E5FF?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Download-Fast-FF6D00?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Multiuser-Enabled-7C4DFF?style=for-the-badge">
+</p>
+
+- 📤 Subida de archivos
+- 📥 Descarga de archivos
+- 👥 Acceso multiusuario
+- 📂 Organización básica
+- 🔄 Sincronización
+- 🔒 Seguridad opcional
+
+---
+
+## 🖼️ Preview
+
+<p align="center">
+  <img src="https://via.placeholder.com/800x400/0d1117/00E5FF?text=FileShare+App+Preview">
+</p>
+
+---
+
+## 🛠️ Tecnologías
+
+```diff
++ Frontend: HTML / CSS / JavaScript
++ Backend: Node.js / Express
++ Database: MongoDB
++ Storage: Local / Cloud
