@@ -1,59 +1,67 @@
-# 🌈 FileShare App
+# 🚀 app_upxy — Comparte archivos sin límites
+
+<p align="center">
+  <img src="./banner.png" alt="app_upxy banner" width="100%">
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge&color=00C853">
-  <img src="https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge">
+  <img src="https://img.shields.io/badge/python-3.10+-blue?style=for-the-badge">
+  <img src="https://img.shields.io/badge/platform-local--network-orange?style=for-the-badge">
+  <img src="https://img.shields.io/badge/speed-fast-00E5FF?style=for-the-badge">
   <img src="https://img.shields.io/badge/license-MIT-purple?style=for-the-badge">
 </p>
 
 <p align="center">
-  📁 Comparte, sube y descarga archivos fácilmente entre usuarios
+  ⚡ La forma más rápida de compartir archivos en tu red local  
 </p>
 
 ---
 
-## ✨ Descripción
+## 🔥 ¿Qué es app_upxy?
 
-**FileShare App** es una aplicación diseñada para permitir a los usuarios:
+**app_upxy** es una app ultra simple para compartir archivos entre dispositivos **sin nube, sin cuentas y sin complicaciones**.
 
-🔹 Subir archivos  
-🔹 Ver contenido compartido  
-🔹 Descargar archivos  
-🔹 Compartir con otros usuarios  
-
-Todo en una plataforma simple, rápida y accesible.
+💡 Solo ejecuta → sube archivos → compártelos al instante
 
 ---
 
-## 🚀 Características
+## 🚀 ¿Por qué usarlo?
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Upload-Files-00E5FF?style=for-the-badge">
-  <img src="https://img.shields.io/badge/Download-Fast-FF6D00?style=for-the-badge">
-  <img src="https://img.shields.io/badge/Multiuser-Enabled-7C4DFF?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Sin nube-100%25 local-success?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Sin cuentas-0 registro-blue?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Súper rápido-Instantáneo-purple?style=for-the-badge">
 </p>
 
-- 📤 Subida de archivos
-- 📥 Descarga de archivos
-- 👥 Acceso multiusuario
-- 📂 Organización básica
-- 🔄 Sincronización
-- 🔒 Seguridad opcional
+✔️ Funciona en tu red local  
+✔️ Acceso inmediato desde otros dispositivos  
+✔️ Sin subir archivos a internet  
+✔️ Ideal para compartir rápido  
 
 ---
 
-## 🖼️ Preview
+## 🎯 Funcionalidades
 
-<p align="center">
-  <img src="https://via.placeholder.com/800x400/0d1117/00E5FF?text=FileShare+App+Preview">
-</p>
+- 📤 Subir archivos en segundos  
+- 📄 Ver lista de archivos compartidos  
+- 📥 Descargar archivos fácilmente  
+- 🌐 Acceso desde cualquier dispositivo en la red  
+- ⚡ Rendimiento ligero  
 
 ---
 
-## 🛠️ Tecnologías
+## ⚡ Instalación ultra rápida
 
-```diff
-+ Frontend: HTML / CSS / JavaScript
-+ Backend: Node.js / Express
-+ Database: MongoDB
-+ Storage: Local / Cloud
+```bash
+python -m venv .venv
+
+# Activar entorno
+source .venv/bin/activate   # Linux / Mac
+.venv\Scripts\activate      # Windows
+
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Ejecutar app
+python app.py
