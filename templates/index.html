@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Repositorio de Archivos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Repositorio de Archivos Compartidos</h1>
+      <p>Sube archivos para que otros usuarios del programa puedan verlos y descargarlos.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <section>
+        {% for category, message in messages %}
+        <p class="message {{ category }}">{{ message }}</p>
+        {% endfor %}
+      </section>
+      {% endif %}
+      {% endwith %}
+
+      <section class="card">
+        <h2>Subir archivo</h2>
+        <form method="post" action="{{ url_for('upload_file') }}" enctype="multipart/form-data">
+          <label for="username">Tu nombre</label>
+          <input id="username" name="username" type="text" required maxlength="80" />
+
+          <label for="file">Archivo</label>
+          <input id="file" name="file" type="file" required />
+
+          <button type="submit">Subir</button>
+        </form>
+        <p class="hint">Formatos permitidos: {{ allowed }}</p>
+      </section>
+
+      <section class="card">
+        <h2>Archivos disponibles</h2>
+        {% if files %}
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Subido por</th>
+              <th>Fecha</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for file in files %}
+            <tr>
+              <td>{{ file['original_name'] }}</td>
+              <td>{{ file['uploaded_by'] }}</td>
+              <td>{{ file['uploaded_at'] }}</td>
+              <td><a href="{{ url_for('download_file', file_id=file['id']) }}">Descargar</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>Aún no hay archivos.</p>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+</html>
