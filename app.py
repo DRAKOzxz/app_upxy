@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sqlite3
+import time
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
@@ -22,6 +23,7 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "cambia-esta-clave-en-produccion"
+app.config["MAX_CONTENT_LENGTH"] = 200 * 1024 * 1024  # 200 MB por archivo
 
 BASE_DIR = Path(__file__).resolve().parent
 UPLOAD_DIR = BASE_DIR / "uploads"
@@ -35,6 +37,14 @@ def get_db() -> sqlite3.Connection:
         g.db = sqlite3.connect(DB_PATH)
         g.db.row_factory = sqlite3.Row
     return g.db
+
+
+def console_event(title: str, detail: str = "") -> None:
+    frames = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    for frame in frames[:6]:
+        print(f"\r\033[96m{frame} {title}\033[0m", end="", flush=True)
+        time.sleep(0.02)
+    print(f"\r\033[92m✔ {title}\033[0m {detail}".rstrip())
 
 
 @app.teardown_appcontext
@@ -96,6 +106,7 @@ def init_db() -> None:
         if "discord_handle" not in user_cols:
             db.execute("ALTER TABLE users ADD COLUMN discord_handle TEXT DEFAULT ''")
         db.commit()
+    console_event("Base de datos lista", str(DB_PATH))
 
 
 init_db()
@@ -234,6 +245,7 @@ def register():
             (username, generate_password_hash(password), datetime.utcnow().isoformat()),
         )
         db.commit()
+        console_event("Registro", f"nuevo usuario: {username}")
         flash("Cuenta creada. Ahora inicia sesión.", "success")
         return redirect(url_for("login"))
 
@@ -257,6 +269,7 @@ def login():
 
         session.clear()
         session["user_id"] = user["id"]
+        console_event("Login", f"usuario: {user['username']}")
         flash(f"Bienvenido/a {user['username']}.", "success")
         return redirect(url_for("index"))
 
@@ -265,6 +278,7 @@ def login():
 
 @app.get("/logout")
 def logout():
+    console_event("Logout")
     session.clear()
     flash("Sesión cerrada.", "success")
     return redirect(url_for("login"))
@@ -285,6 +299,7 @@ def update_profile():
         (bio, discord_handle, int(user["id"])),
     )
     db.commit()
+    console_event("Perfil actualizado", f"usuario: {user['username']}")
     flash("Perfil actualizado.", "success")
     return redirect(url_for("index"))
 
@@ -329,6 +344,7 @@ def send_friend_request():
         (me, other_id, datetime.utcnow().isoformat()),
     )
     db.commit()
+    console_event("Solicitud de amistad", f"de {user['username']} para {username}")
     flash("Solicitud enviada.", "success")
     return redirect(url_for("index"))
 
@@ -352,6 +368,7 @@ def accept_friend_request(request_id: int):
 
     db.execute("UPDATE friendships SET status = 'accepted' WHERE id = ?", (request_id,))
     db.commit()
+    console_event("Amistad aceptada", f"usuario: {user['username']}")
     flash("Amistad aceptada. Ya puedes chatear en privado.", "success")
     return redirect(url_for("index"))
 
@@ -378,6 +395,7 @@ def send_private_message(friend_id: int):
         (me, friend_id, content[:800], datetime.utcnow().isoformat()),
     )
     db.commit()
+    console_event("Mensaje privado", f"de {user['username']} para friend_id={friend_id}")
     return redirect(url_for("index", friend=friend_id))
 
 
@@ -398,7 +416,14 @@ def upload_file():
         return redirect(url_for("index"))
 
     file.save(destination)
+    console_event("Archivo subido", filename)
     flash(f"Archivo '{filename}' subido correctamente.", "success")
+    return redirect(url_for("index"))
+
+
+@app.errorhandler(413)
+def too_large_file(_: Any):
+    flash("El archivo excede el límite permitido (200 MB).", "error")
     return redirect(url_for("index"))
 
 

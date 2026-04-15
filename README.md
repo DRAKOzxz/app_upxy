@@ -11,6 +11,7 @@ Aplicación web para compartir archivos, con perfiles y chat privado entre amigo
 - Subir archivos compartidos.
 - Ver listado de archivos compartidos.
 - Descargar archivos.
+- Animaciones/eventos en consola cuando ocurren acciones importantes (login, subida, chat, etc.).
 
 ## Requisitos
 
@@ -33,6 +34,7 @@ Luego abre: `http://localhost:5000`
 - Los archivos se guardan en `uploads/`.
 - Los usuarios, amistades y mensajes privados se guardan en `app.db` (SQLite).
 - Si ya tienes archivos en `uploads/`, se mantienen sin borrarse.
+- Límite de tamaño de subida: **200 MB** por archivo.
 
 ## Archivos importantes
 
