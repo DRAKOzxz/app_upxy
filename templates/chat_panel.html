@@ -12,6 +12,15 @@
     <div class="msg {% if msg.sender_id == user.id %}mine{% endif %}">
       <p class="msg-head">{{ msg.sender_username }} · {{ msg.created_at }}</p>
       <p>{{ msg.content }}</p>
+      {% if msg.sender_id == user.id %}
+      <form
+        action="{{ url_for('delete_private_message', message_id=msg.id) }}"
+        method="post"
+        class="inline-form"
+      >
+        <button type="submit" class="danger-btn">Eliminar mensaje</button>
+      </form>
+      {% endif %}
     </div>
     {% else %}
     <p>Aún no hay mensajes entre ustedes.</p>
