@@ -2,6 +2,14 @@
   <h2>💬 Chat privado</h2>
   {% if selected_friend %}
   <p>Hablando con <strong>{{ selected_friend.username }}</strong>.</p>
+  <div class="call-actions">
+    <form action="{{ url_for('start_private_call', friend_id=selected_friend.id) }}" method="post" class="inline-form">
+      <button type="submit">📞 Llamada privada</button>
+    </form>
+    {% if active_call %}
+    <a class="link-btn" href="{{ url_for('call_room', session_id=active_call.id) }}">Entrar a llamada activa</a>
+    {% endif %}
+  </div>
   <form action="{{ url_for('send_private_message', friend_id=selected_friend.id) }}" method="post" class="chat-form">
     <textarea name="content" placeholder="Mensaje privado..." rows="3" maxlength="800" required></textarea>
     <button type="submit">Enviar</button>
