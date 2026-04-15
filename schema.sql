@@ -29,3 +29,25 @@ CREATE TABLE IF NOT EXISTS direct_messages (
     FOREIGN KEY(sender_id) REFERENCES users(id),
     FOREIGN KEY(receiver_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS call_sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    caller_id INTEGER NOT NULL,
+    callee_id INTEGER NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('pending', 'active', 'ended')),
+    created_at TEXT NOT NULL,
+    ended_at TEXT,
+    FOREIGN KEY(caller_id) REFERENCES users(id),
+    FOREIGN KEY(callee_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS call_signals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id INTEGER NOT NULL,
+    sender_id INTEGER NOT NULL,
+    signal_type TEXT NOT NULL,
+    payload TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY(session_id) REFERENCES call_sessions(id),
+    FOREIGN KEY(sender_id) REFERENCES users(id)
+);
