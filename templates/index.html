@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UPXY - PRIVATE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="bg-reactive" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <main class="container">
+      <header class="topbar neon-card">
+        <div>
+          <h1>UPXY  -  PRIVATE</h1>
+          <p class="subtitle">Conectado como <strong>{{ user.username }}</strong></p>
+        </div>
+        <a class="link-btn" href="{{ url_for('logout') }}">Cerrar sesión</a>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="alerts">
+        {% for category, message in messages %}
+        <div class="alert {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      <section class="stats-row">
+        <article class="card stat-card">
+          <p>Total de archivos</p>
+          <h3>{{ file_count }}</h3>
+        </article>
+        <article class="card stat-card">
+          <p>Tamaño total</p>
+          <h3>{{ total_size_mb }} MB</h3>
+        </article>
+        <article class="card stat-card">
+          <p>Límite por archivo</p>
+          <h3>1 GB</h3>
+        </article>
+      </section>
+
+      <section class="layout-3">
+        <aside class="card sidebar neon-card">
+          <h2>👤 Perfil</h2>
+          <form action="{{ url_for('update_profile') }}" method="post" class="auth-form">
+            <label>
+              Usuario Discord
+              <input
+                type="text"
+                name="discord_handle"
+                maxlength="64"
+                placeholder="ej. usuario#1234"
+                value="{{ user.discord_handle }}"
+              />
+            </label>
+            <label>
+              Bio
+              <textarea name="bio" rows="3" maxlength="240">{{ user.bio }}</textarea>
+            </label>
+            <button type="submit">Guardar perfil</button>
+          </form>
+
+          <hr />
+
+          <h2>➕ Añadir amigo</h2>
+          <form action="{{ url_for('send_friend_request') }}" method="post" class="auth-form">
+            <input type="text" name="username" placeholder="Nombre de usuario" required />
+            <button type="submit">Enviar solicitud</button>
+          </form>
+
+          <h3>Solicitudes pendientes</h3>
+          <div class="request-list">
+            {% for req in pending_requests %}
+            <form action="{{ url_for('accept_friend_request', request_id=req.id) }}" method="post" class="request-item">
+              <span>
+                {{ req.username }} {% if req.discord_handle %}<small>({{ req.discord_handle }})</small>{% endif %}
+              </span>
+              <button type="submit">Aceptar</button>
+            </form>
+            {% else %}
+            <p>Sin solicitudes.</p>
+            {% endfor %}
+          </div>
+
+          <h3>Amigos</h3>
+          <ul class="friends-list">
+            {% for friend in friends %}
+            <li>
+              <a href="{{ url_for('index', friend=friend.id) }}">
+                {{ friend.username }} {% if friend.discord_handle %}<small>({{ friend.discord_handle }})</small>{% endif %}
+              </a>
+            </li>
+            {% else %}
+            <li>Aún no tienes amigos.</li>
+            {% endfor %}
+          </ul>
+        </aside>
+
+        <section class="card neon-card">
+          <h2>Subir archivo</h2>
+          <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" required />
+            <button type="submit">Subir</button>
+          </form>
+          <p class="hint">Tamaño máximo por archivo: <strong>1 GB</strong>.</p>
+
+          <div class="file-tools">
+            <input id="file-search" type="search" placeholder="Buscar archivo por nombre..." />
+          </div>
+
+          <h2>Archivos disponibles</h2>
+          {% if files %}
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Tamaño (KB)</th>
+                <th>Actualizado</th>
+                <th>Descarga</th>
+                <th>Eliminar</th>
+              </tr>
+            </thead>
+            <tbody id="files-table-body">
+              {% for file in files %}
+              <tr class="file-row" data-filename="{{ file.name|lower }}">
+                <td>{{ file.name }}</td>
+                <td>{{ file.size_kb }}</td>
+                <td>{{ file.updated }}</td>
+                <td><a href="{{ url_for('download_file', filename=file.name) }}">Descargar</a></td>
+                <td>
+                  <form action="{{ url_for('delete_file', filename=file.name) }}" method="post" class="inline-form">
+                    <button type="submit" class="danger-btn">Eliminar</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No hay archivos todavía. ¡Sube el primero!</p>
+          {% endif %}
+        </section>
+
+        {% include "chat_panel.html" %}
+      </section>
+
+      <footer class="card footer-links neon-card">
+        <h3>Redes del creador</h3>
+        <ul>
+          <li>Instagram: <a href="https://instagram.com/drako_343" target="_blank" rel="noreferrer">@drako_343</a></li>
+          <li>TikTok: <a href="https://www.tiktok.com/@drako_343" target="_blank" rel="noreferrer">@drako_343</a></li>
+          <li>GitHub: <a href="https://github.com/drako_zxz" target="_blank" rel="noreferrer">drako_zxz</a></li>
+        </ul>
+      </footer>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
