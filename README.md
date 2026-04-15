@@ -22,6 +22,7 @@ Aplicación web para compartir archivos, con perfiles y chat privado entre amigo
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+python init_app_db.py
 python app.py
 ```
 
@@ -32,3 +33,9 @@ Luego abre: `http://localhost:5000`
 - Los archivos se guardan en `uploads/`.
 - Los usuarios, amistades y mensajes privados se guardan en `app.db` (SQLite).
 - Si ya tienes archivos en `uploads/`, se mantienen sin borrarse.
+
+## Archivos importantes
+
+- `schema.sql`: esquema de base de datos (usuarios, amistades, chat privado).
+- `init_app_db.py`: genera/actualiza `app.db` usando el esquema.
+- `templates/chat_panel.html`: bloque dedicado de la UI del chat privado.
