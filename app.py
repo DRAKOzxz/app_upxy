@@ -23,7 +23,7 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "cambia-esta-clave-en-produccion"
-app.config["MAX_CONTENT_LENGTH"] = 200 * 1024 * 1024  # 200 MB por archivo
+app.config["MAX_CONTENT_LENGTH"] = 1024 * 1024 * 1024  # 1 GB por archivo
 
 BASE_DIR = Path(__file__).resolve().parent
 UPLOAD_DIR = BASE_DIR / "uploads"
@@ -178,6 +178,8 @@ def index() -> str:
                 }
             )
 
+    total_size_mb = round(sum(f["size_kb"] for f in files) / 1024, 2)
+
     db = get_db()
     pending_requests = db.execute(
         """
@@ -221,6 +223,8 @@ def index() -> str:
         pending_requests=pending_requests,
         selected_friend=selected_friend,
         conversation=conversation,
+        file_count=len(files),
+        total_size_mb=total_size_mb,
     )
 
 
@@ -423,7 +427,7 @@ def upload_file():
 
 @app.errorhandler(413)
 def too_large_file(_: Any):
-    flash("El archivo excede el límite permitido (200 MB).", "error")
+    flash("El archivo excede el límite permitido (1 GB).", "error")
     return redirect(url_for("index"))
 
 
