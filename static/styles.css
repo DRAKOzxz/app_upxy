@@ -26,6 +26,11 @@ body {
   color: #cbd5e1;
 }
 
+.hint {
+  font-size: 0.9rem;
+  color: #93c5fd;
+}
+
 .layout-3 {
   display: grid;
   grid-template-columns: 300px 1.4fr 1fr;
