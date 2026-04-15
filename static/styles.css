@@ -149,6 +149,18 @@ button,
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
+.danger-btn {
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.danger-btn:hover {
+  filter: brightness(1.15);
+}
+
+.inline-form {
+  display: inline-flex;
+}
+
 button:hover,
 .link-btn:hover {
   transform: translateY(-1px) scale(1.02);
