@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Compartir archivos</title>
+    <title>Compartir archivos + Chat privado</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
   <body>
     <main class="container">
       <header class="topbar">
         <div>
-          <h1>📁 App para compartir archivos</h1>
-          <p class="subtitle">Sesión iniciada como <strong>{{ username }}</strong></p>
+          <h1>📁 App de archivos + chat estilo Discord</h1>
+          <p class="subtitle">Conectado como <strong>{{ user.username }}</strong></p>
         </div>
         <a class="link-btn" href="{{ url_for('logout') }}">Cerrar sesión</a>
       </header>
@@ -26,8 +26,64 @@
       {% endif %}
       {% endwith %}
 
-      <section class="grid-2">
-        <article class="card">
+      <section class="layout-3">
+        <aside class="card sidebar">
+          <h2>👤 Perfil</h2>
+          <form action="{{ url_for('update_profile') }}" method="post" class="auth-form">
+            <label>
+              Usuario Discord
+              <input
+                type="text"
+                name="discord_handle"
+                maxlength="64"
+                placeholder="ej. usuario#1234"
+                value="{{ user.discord_handle }}"
+              />
+            </label>
+            <label>
+              Bio
+              <textarea name="bio" rows="3" maxlength="240">{{ user.bio }}</textarea>
+            </label>
+            <button type="submit">Guardar perfil</button>
+          </form>
+
+          <hr />
+
+          <h2>➕ Añadir amigo</h2>
+          <form action="{{ url_for('send_friend_request') }}" method="post" class="auth-form">
+            <input type="text" name="username" placeholder="Nombre de usuario" required />
+            <button type="submit">Enviar solicitud</button>
+          </form>
+
+          <h3>Solicitudes pendientes</h3>
+          <div class="request-list">
+            {% for req in pending_requests %}
+            <form action="{{ url_for('accept_friend_request', request_id=req.id) }}" method="post" class="request-item">
+              <span>
+                {{ req.username }} {% if req.discord_handle %}<small>({{ req.discord_handle }})</small>{% endif %}
+              </span>
+              <button type="submit">Aceptar</button>
+            </form>
+            {% else %}
+            <p>Sin solicitudes.</p>
+            {% endfor %}
+          </div>
+
+          <h3>Amigos</h3>
+          <ul class="friends-list">
+            {% for friend in friends %}
+            <li>
+              <a href="{{ url_for('index', friend=friend.id) }}">
+                {{ friend.username }} {% if friend.discord_handle %}<small>({{ friend.discord_handle }})</small>{% endif %}
+              </a>
+            </li>
+            {% else %}
+            <li>Aún no tienes amigos.</li>
+            {% endfor %}
+          </ul>
+        </aside>
+
+        <section class="card">
           <h2>Subir archivo</h2>
           <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
             <input type="file" name="file" required />
@@ -59,32 +115,31 @@
           {% else %}
           <p>No hay archivos todavía. ¡Sube el primero!</p>
           {% endif %}
-        </article>
+        </section>
 
-        <article class="card chat-card">
-          <h2>💬 Chat común</h2>
-          <form action="{{ url_for('send_message') }}" method="post" class="chat-form">
-            <textarea
-              name="content"
-              placeholder="Escribe un mensaje para todos..."
-              rows="3"
-              maxlength="600"
-              required
-            ></textarea>
+        <section class="card chat-card">
+          <h2>💬 Chat privado</h2>
+          {% if selected_friend %}
+          <p>Hablando con <strong>{{ selected_friend.username }}</strong>.</p>
+          <form action="{{ url_for('send_private_message', friend_id=selected_friend.id) }}" method="post" class="chat-form">
+            <textarea name="content" placeholder="Mensaje privado..." rows="3" maxlength="800" required></textarea>
             <button type="submit">Enviar</button>
           </form>
 
           <div class="chat-box">
-            {% for message in messages %}
-            <div class="msg">
-              <p class="msg-head"><strong>{{ message.username }}</strong> · {{ message.created_at }}</p>
-              <p>{{ message.content }}</p>
+            {% for msg in conversation %}
+            <div class="msg {% if msg.sender_id == user.id %}mine{% endif %}">
+              <p class="msg-head">{{ msg.sender_username }} · {{ msg.created_at }}</p>
+              <p>{{ msg.content }}</p>
             </div>
             {% else %}
-            <p>Sin mensajes todavía.</p>
+            <p>Aún no hay mensajes entre ustedes.</p>
             {% endfor %}
           </div>
-        </article>
+          {% else %}
+          <p>Selecciona un amigo para abrir un chat privado.</p>
+          {% endif %}
+        </section>
       </section>
     </main>
   </body>

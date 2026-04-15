@@ -10,9 +10,9 @@ body {
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
 }
 
 .topbar {
@@ -26,18 +26,24 @@ body {
   color: #cbd5e1;
 }
 
-.grid-2 {
+.layout-3 {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 300px 1.4fr 1fr;
   gap: 1rem;
 }
 
 .card {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(15, 23, 42, 0.65);
   border: 1px solid #334155;
   border-radius: 12px;
   padding: 1rem;
   margin: 1rem 0;
+}
+
+.sidebar {
+  position: sticky;
+  top: 1rem;
+  align-self: start;
 }
 
 form {
@@ -108,50 +114,8 @@ a {
   border-color: #ef4444;
 }
 
-.chat-card {
-  display: flex;
-  flex-direction: column;
-}
-
-.chat-form {
-  display: grid;
-}
-
-.chat-form textarea {
-  width: 100%;
-  resize: vertical;
-}
-
-.chat-box {
-  margin-top: 1rem;
-  max-height: 500px;
-  overflow: auto;
-  display: grid;
-  gap: 0.75rem;
-}
-
-.msg {
-  border: 1px solid #334155;
-  border-radius: 8px;
-  padding: 0.75rem;
-  background: #111827;
-}
-
-.msg p {
-  margin: 0.25rem 0;
-}
-
-.msg-head {
-  font-size: 0.9rem;
-  color: #93c5fd;
-}
-
 .auth-wrap {
   max-width: 480px;
-}
-
-.auth-card h1 {
-  margin-top: 0;
 }
 
 .auth-form {
@@ -168,9 +132,71 @@ a {
   width: fit-content;
 }
 
-@media (max-width: 900px) {
-  .grid-2 {
+.request-list,
+.friends-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.request-item {
+  border: 1px solid #334155;
+  padding: 0.5rem;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.chat-form textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.chat-box {
+  margin-top: 1rem;
+  max-height: 65vh;
+  overflow: auto;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.msg {
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: #111827;
+}
+
+.msg.mine {
+  border-color: #1d4ed8;
+}
+
+.msg p {
+  margin: 0.25rem 0;
+}
+
+.msg-head {
+  font-size: 0.85rem;
+  color: #93c5fd;
+}
+
+@media (max-width: 1100px) {
+  .layout-3 {
     grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
   }
 
   .topbar {

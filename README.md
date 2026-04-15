@@ -1,14 +1,16 @@
 # app_upxy
 
-Aplicación web para compartir archivos con registro de usuarios y chat común.
+Aplicación web para compartir archivos, con perfiles y chat privado entre amigos (estilo Discord).
 
 ## Funciones
 
 - Registro e inicio de sesión con usuario/contraseña.
-- Subir archivos.
+- Menú de perfil con bio y usuario de Discord.
+- Solicitudes de amistad y lista de amigos.
+- Chat privado entre amigos (reemplaza el chat global).
+- Subir archivos compartidos.
 - Ver listado de archivos compartidos.
 - Descargar archivos.
-- Chat global para que todos los usuarios hablen entre sí.
 
 ## Requisitos
 
@@ -28,5 +30,5 @@ Luego abre: `http://localhost:5000`
 ## Nota de datos
 
 - Los archivos se guardan en `uploads/`.
-- Los usuarios y mensajes del chat se guardan en `app.db` (SQLite).
+- Los usuarios, amistades y mensajes privados se guardan en `app.db` (SQLite).
 - Si ya tienes archivos en `uploads/`, se mantienen sin borrarse.
