@@ -425,6 +425,50 @@ def upload_file():
     return redirect(url_for("index"))
 
 
+@app.post("/files/delete/<path:filename>")
+@login_required
+def delete_file(filename: str):
+    safe_name = secure_filename(filename)
+    target = UPLOAD_DIR / safe_name
+
+    if not target.exists() or not target.is_file():
+        flash("El archivo no existe o ya fue eliminado.", "error")
+        return redirect(url_for("index"))
+
+    target.unlink(missing_ok=True)
+    console_event("Archivo eliminado", safe_name)
+    flash(f"Archivo '{safe_name}' eliminado.", "success")
+    return redirect(url_for("index"))
+
+
+@app.post("/chat/private/delete/<int:message_id>")
+@login_required
+def delete_private_message(message_id: int):
+    user = current_user()
+    assert user is not None
+    me = int(user["id"])
+
+    db = get_db()
+    msg = db.execute(
+        "SELECT id, sender_id, receiver_id FROM direct_messages WHERE id = ?",
+        (message_id,),
+    ).fetchone()
+
+    if msg is None:
+        flash("Mensaje no encontrado.", "error")
+        return redirect(url_for("index"))
+
+    if int(msg["sender_id"]) != me:
+        flash("Solo puedes eliminar tus propios mensajes.", "error")
+        return redirect(url_for("index", friend=int(msg["receiver_id"])))
+
+    db.execute("DELETE FROM direct_messages WHERE id = ?", (message_id,))
+    db.commit()
+    console_event("Mensaje eliminado", f"id={message_id}")
+    flash("Mensaje eliminado.", "success")
+    return redirect(url_for("index", friend=int(msg["receiver_id"])))
+
+
 @app.errorhandler(413)
 def too_large_file(_: Any):
     flash("El archivo excede el límite permitido (1 GB).", "error")
