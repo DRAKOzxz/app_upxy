@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Llamada privada</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="topbar card neon-card">
+        <div>
+          <h1>Llamada privada con {{ partner_name }}</h1>
+          <p class="subtitle">Configuración: 720p / 1080p y 30 / 60 / 120 FPS</p>
+        </div>
+        <a class="link-btn" href="{{ url_for('index') }}">Volver</a>
+      </header>
+
+      <section class="card neon-card call-settings">
+        <label>
+          Resolución
+          <select id="quality">
+            <option value="720">720p</option>
+            <option value="1080">1080p</option>
+          </select>
+        </label>
+        <label>
+          FPS
+          <select id="fps">
+            <option value="30">30 FPS</option>
+            <option value="60">60 FPS</option>
+            <option value="120">120 FPS</option>
+          </select>
+        </label>
+        <button id="start-camera" type="button">Iniciar cámara</button>
+        <button id="share-screen" type="button">Transmitir pantalla</button>
+        <button id="end-call" type="button" class="danger-btn">Finalizar llamada</button>
+      </section>
+
+      <section class="call-grid">
+        <article class="card neon-card">
+          <h3>Tu video</h3>
+          <video id="local-video" autoplay playsinline muted class="call-video"></video>
+        </article>
+        <article class="card neon-card">
+          <h3>Video remoto</h3>
+          <video id="remote-video" autoplay playsinline class="call-video"></video>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      window.CALL_CONFIG = {
+        sessionId: {{ call.id }},
+        me: {{ me }},
+        status: "{{ call.status }}"
+      };
+    </script>
+    <script src="{{ url_for('static', filename='calls.js') }}"></script>
+  </body>
+</html>
