@@ -87,7 +87,7 @@ def init_db() -> None:
             )
             db.execute(
                 """
-                CREATE TABLE IF NOT EXISTS direct_messages (
+        CREATE TABLE IF NOT EXISTS direct_messages (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     sender_id INTEGER NOT NULL,
                     receiver_id INTEGER NOT NULL,
@@ -95,6 +95,34 @@ def init_db() -> None:
                     created_at TEXT NOT NULL,
                     FOREIGN KEY(sender_id) REFERENCES users(id),
                     FOREIGN KEY(receiver_id) REFERENCES users(id)
+                )
+        """
+            )
+            db.execute(
+                """
+                CREATE TABLE IF NOT EXISTS call_sessions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    caller_id INTEGER NOT NULL,
+                    callee_id INTEGER NOT NULL,
+                    status TEXT NOT NULL CHECK(status IN ('pending', 'active', 'ended')),
+                    created_at TEXT NOT NULL,
+                    ended_at TEXT,
+                    FOREIGN KEY(caller_id) REFERENCES users(id),
+                    FOREIGN KEY(callee_id) REFERENCES users(id)
+                )
+                """
+            )
+            db.execute(
+                """
+                CREATE TABLE IF NOT EXISTS call_signals (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id INTEGER NOT NULL,
+                    sender_id INTEGER NOT NULL,
+                    signal_type TEXT NOT NULL,
+                    payload TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(session_id) REFERENCES call_sessions(id),
+                    FOREIGN KEY(sender_id) REFERENCES users(id)
                 )
                 """
             )
@@ -196,6 +224,7 @@ def index() -> str:
 
     selected_friend = None
     conversation: list[sqlite3.Row] = []
+    active_call = None
     selected_friend_id = request.args.get("friend", type=int)
     if selected_friend_id and are_friends(user_id, selected_friend_id):
         selected_friend = db.execute(
@@ -214,6 +243,17 @@ def index() -> str:
             """,
             (user_id, selected_friend_id, selected_friend_id, user_id),
         ).fetchall()
+        active_call = db.execute(
+            """
+            SELECT id, status
+            FROM call_sessions
+            WHERE status IN ('pending', 'active')
+              AND ((caller_id = ? AND callee_id = ?) OR (caller_id = ? AND callee_id = ?))
+            ORDER BY id DESC
+            LIMIT 1
+            """,
+            (user_id, selected_friend_id, selected_friend_id, user_id),
+        ).fetchone()
 
     return render_template(
         "index.html",
@@ -225,6 +265,7 @@ def index() -> str:
         conversation=conversation,
         file_count=len(files),
         total_size_mb=total_size_mb,
+        active_call=active_call,
     )
 
 
@@ -401,6 +442,172 @@ def send_private_message(friend_id: int):
     db.commit()
     console_event("Mensaje privado", f"de {user['username']} para friend_id={friend_id}")
     return redirect(url_for("index", friend=friend_id))
+
+
+@app.post("/calls/start/<int:friend_id>")
+@login_required
+def start_private_call(friend_id: int):
+    user = current_user()
+    assert user is not None
+    me = int(user["id"])
+
+    if not are_friends(me, friend_id):
+        flash("Solo puedes iniciar llamadas con amigos.", "error")
+        return redirect(url_for("index"))
+
+    db = get_db()
+    db.execute(
+        """
+        INSERT INTO call_sessions (caller_id, callee_id, status, created_at)
+        VALUES (?, ?, 'pending', ?)
+        """,
+        (me, friend_id, datetime.utcnow().isoformat()),
+    )
+    db.commit()
+    session_id = db.execute("SELECT last_insert_rowid() AS id").fetchone()["id"]
+    console_event("Llamada iniciada", f"session_id={session_id}")
+    return redirect(url_for("call_room", session_id=int(session_id)))
+
+
+@app.post("/calls/accept/<int:session_id>")
+@login_required
+def accept_private_call(session_id: int):
+    user = current_user()
+    assert user is not None
+    me = int(user["id"])
+
+    db = get_db()
+    call = db.execute(
+        "SELECT id, callee_id, status FROM call_sessions WHERE id = ?",
+        (session_id,),
+    ).fetchone()
+    if call is None or int(call["callee_id"]) != me:
+        flash("No tienes permiso para aceptar esta llamada.", "error")
+        return redirect(url_for("index"))
+
+    if call["status"] == "ended":
+        flash("La llamada ya terminó.", "error")
+        return redirect(url_for("index"))
+
+    db.execute("UPDATE call_sessions SET status = 'active' WHERE id = ?", (session_id,))
+    db.commit()
+    console_event("Llamada aceptada", f"session_id={session_id}")
+    return redirect(url_for("call_room", session_id=session_id))
+
+
+@app.get("/calls/<int:session_id>")
+@login_required
+def call_room(session_id: int):
+    user = current_user()
+    assert user is not None
+    me = int(user["id"])
+    db = get_db()
+
+    call = db.execute(
+        """
+        SELECT c.*, u1.username AS caller_name, u2.username AS callee_name
+        FROM call_sessions c
+        JOIN users u1 ON u1.id = c.caller_id
+        JOIN users u2 ON u2.id = c.callee_id
+        WHERE c.id = ?
+        """,
+        (session_id,),
+    ).fetchone()
+    if call is None or me not in (int(call["caller_id"]), int(call["callee_id"])):
+        flash("No tienes acceso a esta sala.", "error")
+        return redirect(url_for("index"))
+
+    if call["status"] == "pending" and int(call["callee_id"]) == me:
+        db.execute("UPDATE call_sessions SET status = 'active' WHERE id = ?", (session_id,))
+        db.commit()
+
+    partner_name = call["callee_name"] if int(call["caller_id"]) == me else call["caller_name"]
+    return render_template("call_room.html", call=call, me=me, partner_name=partner_name)
+
+
+@app.post("/calls/signal/<int:session_id>")
+@login_required
+def post_call_signal(session_id: int):
+    user = current_user()
+    assert user is not None
+    me = int(user["id"])
+    db = get_db()
+
+    call = db.execute(
+        "SELECT id, caller_id, callee_id, status FROM call_sessions WHERE id = ?",
+        (session_id,),
+    ).fetchone()
+    if call is None or me not in (int(call["caller_id"]), int(call["callee_id"])) or call["status"] == "ended":
+        return {"ok": False}, 403
+
+    signal_type = request.json.get("type", "")
+    payload = request.json.get("payload", "")
+    db.execute(
+        """
+        INSERT INTO call_signals (session_id, sender_id, signal_type, payload, created_at)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (session_id, me, signal_type, payload, datetime.utcnow().isoformat()),
+    )
+    db.commit()
+    return {"ok": True}
+
+
+@app.get("/calls/signal/<int:session_id>")
+@login_required
+def get_call_signals(session_id: int):
+    user = current_user()
+    assert user is not None
+    me = int(user["id"])
+    after_id = request.args.get("after_id", default=0, type=int)
+    db = get_db()
+
+    call = db.execute(
+        "SELECT id, caller_id, callee_id, status FROM call_sessions WHERE id = ?",
+        (session_id,),
+    ).fetchone()
+    if call is None or me not in (int(call["caller_id"]), int(call["callee_id"])) or call["status"] == "ended":
+        return {"signals": [], "ended": True}
+
+    signals = db.execute(
+        """
+        SELECT id, sender_id, signal_type, payload
+        FROM call_signals
+        WHERE session_id = ? AND id > ? AND sender_id != ?
+        ORDER BY id ASC
+        LIMIT 50
+        """,
+        (session_id, after_id, me),
+    ).fetchall()
+
+    return {
+        "signals": [dict(row) for row in signals],
+        "ended": False,
+    }
+
+
+@app.post("/calls/end/<int:session_id>")
+@login_required
+def end_call(session_id: int):
+    user = current_user()
+    assert user is not None
+    me = int(user["id"])
+    db = get_db()
+
+    call = db.execute(
+        "SELECT id, caller_id, callee_id, status FROM call_sessions WHERE id = ?",
+        (session_id,),
+    ).fetchone()
+    if call is None or me not in (int(call["caller_id"]), int(call["callee_id"])):
+        return {"ok": False}, 403
+
+    db.execute(
+        "UPDATE call_sessions SET status = 'ended', ended_at = ? WHERE id = ?",
+        (datetime.utcnow().isoformat(), session_id),
+    )
+    db.commit()
+    console_event("Llamada finalizada", f"session_id={session_id}")
+    return {"ok": True}
 
 
 @app.post("/upload")
